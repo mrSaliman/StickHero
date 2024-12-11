@@ -15,6 +15,9 @@
     "_children": [
       {
         "__id__": 2
+      },
+      {
+        "__id__": 11
       }
     ],
     "_active": true,
@@ -78,10 +81,10 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 8
+        "__id__": 9
       },
       {
-        "__id__": 9
+        "__id__": 10
       }
     ],
     "_prefab": null,
@@ -306,7 +309,9 @@
         "__id__": 7
       }
     ],
-    "_prefab": null,
+    "_prefab": {
+      "__id__": 8
+    },
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
@@ -317,7 +322,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 18,
+      "width": 12,
       "height": 267
     },
     "_anchorPoint": {
@@ -387,6 +392,17 @@
     "_id": "faF241tyBItq2vpi3dd6IW"
   },
   {
+    "__type__": "cc.PrefabInfo",
+    "root": {
+      "__id__": 6
+    },
+    "asset": {
+      "__uuid__": "e75129b7-576f-47c2-9ef9-3ce1be8c2423"
+    },
+    "fileId": "",
+    "sync": false
+  },
+  {
     "__type__": "cc.Canvas",
     "_name": "",
     "_objFlags": 0,
@@ -429,5 +445,79 @@
     "_originalWidth": 0,
     "_originalHeight": 0,
     "_id": "9fWE3naMFFOK5WO/vWAOHY"
+  },
+  {
+    "__type__": "cc.Node",
+    "_name": "PlatformsViewController",
+    "_objFlags": 0,
+    "_parent": {
+      "__id__": 1
+    },
+    "_children": [],
+    "_active": true,
+    "_components": [
+      {
+        "__id__": 12
+      }
+    ],
+    "_prefab": null,
+    "_opacity": 255,
+    "_color": {
+      "__type__": "cc.Color",
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
+    },
+    "_contentSize": {
+      "__type__": "cc.Size",
+      "width": 0,
+      "height": 0
+    },
+    "_anchorPoint": {
+      "__type__": "cc.Vec2",
+      "x": 0.5,
+      "y": 0.5
+    },
+    "_trs": {
+      "__type__": "TypedArray",
+      "ctor": "Float64Array",
+      "array": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "_eulerAngles": {
+      "__type__": "cc.Vec3",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "_skewX": 0,
+    "_skewY": 0,
+    "_is3DNode": false,
+    "_groupIndex": 0,
+    "groupIndex": 0,
+    "_id": "f9J3aFPQ1DL5eGHKGJKstN"
+  },
+  {
+    "__type__": "2cbe9BjslxFqqpNH60Wuh1E",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 11
+    },
+    "_enabled": true,
+    "platformViewPrefab": null,
+    "platformsFolder": null,
+    "_id": "faFlg9H2BM5bnqZxIClAxc"
   }
 ]

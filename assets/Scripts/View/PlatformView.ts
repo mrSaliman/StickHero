@@ -1,7 +1,7 @@
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class PlatformView extends cc.Component implements IPoolable {
+export default class PlatformView extends cc.Component {
     
 
     private base: Platform | undefined;
@@ -19,9 +19,5 @@ export default class PlatformView extends cc.Component implements IPoolable {
         this.node.width = this.base.width;
         this.node.setPosition(this.base.position);
         this.node.active = this.base.isVisible;
-    }
-
-    reset(): void {
-        
     }
 }
