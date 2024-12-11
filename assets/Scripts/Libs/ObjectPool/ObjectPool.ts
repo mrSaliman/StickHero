@@ -1,4 +1,6 @@
-export class ObjectPool<T extends IPoolable> {
+import { IObjectPool } from "./IObjectPool";
+
+export class ObjectPool<T extends IPoolable> implements IObjectPool<T>{
     private pool: T[] = [];
     private factory: () => T;
 
