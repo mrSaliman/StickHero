@@ -1,3 +1,3 @@
-interface IPoolable {
+export interface IPoolable {
     reset(): void;
 }

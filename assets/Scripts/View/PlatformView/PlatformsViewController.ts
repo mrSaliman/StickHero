@@ -1,4 +1,5 @@
-import { PlatformsController } from "../Game/PlatformsController";
+import { Platform } from "../../Game/Platform/Platform";
+import { PlatformsController } from "../../Game/Platform/PlatformsController";
 import PlatformView from "./PlatformView";
 
 const {ccclass, property} = cc._decorator;
@@ -10,8 +11,23 @@ export default class PlatformsViewController extends cc.Component {
     @property(cc.Prefab)
     platformViewPrefab: cc.Prefab = null;
 
-    @property (cc.Node)
+    @property(cc.Node)
     platformsFolder: cc.Node = null;
+
+    @property({
+        min: 0.01,
+        max: 0.99
+    })
+    bottomIndentPercent = 0.15;
+
+    private _currentFieldSize: cc.Size = null;
+
+    public updateFieldSize(size: cc.Size){
+        this._currentFieldSize = size;
+        this.paltformsList.forEach(platformView => {
+            platformView.fieldSize = size;
+        });
+    }
 
     protected onLoad(): void {
         if (this.platformViewPrefab === null || this.platformsFolder === null){
@@ -20,13 +36,15 @@ export default class PlatformsViewController extends cc.Component {
     }
 
     public init(base: PlatformsController){
-        base.platformCreated.on(this.CreatePlatform)
+        base.platformCreated.on((base: Platform) => this.CreatePlatform(base))
     }
 
     CreatePlatform(base: Platform){
         let platform = cc.instantiate(this.platformViewPrefab);
         this.platformsFolder.addChild(platform);
         let view = platform.getComponent(PlatformView);
+        view.bottomIndentPercent = this.bottomIndentPercent;
+        view.fieldSize = this._currentFieldSize;
         view.init(base);
         this.paltformsList.push(view);
     }
