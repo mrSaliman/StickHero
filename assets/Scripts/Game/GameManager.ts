@@ -13,6 +13,9 @@ export default class GameManager {
         input.TouchEnded.on(() => this.onTouchEnd());
     }
 
+    private inputLocked: boolean = false;
+    private inputStarted: boolean = false;
+
     private _controllers: ControllerStack = {
         platformsController: new PlatformsController(),
         sticksController: new SticksController(),
@@ -22,29 +25,56 @@ export default class GameManager {
     }
 
     public GameStart(){
-        this._controllers.platformsController.reset();
+        this._controllers.platformsController.reset()
+            .call(() => {
+                this.inputLocked = false;
+            })
+            .start();
         this._controllers.sticksController.startStickPosition = this._controllers.platformsController.platformEnd;
+        this._controllers.sticksController.distToMoveLast = this._controllers.platformsController.currentDistance;
         this._controllers.sticksController.reset();
     }
 
     onTouchStart(){
+        if (this.inputLocked) return;
         this._controllers.sticksController.startGrowing();
+        this.inputStarted = true;
     }
 
     onTouchEnd(){
-        let stickLength = this._controllers.sticksController.stopGrowing();
+        if (this.inputLocked || !this.inputStarted) return;
+        this.inputLocked = true;
+        this.inputStarted = false;
+        let [stickLength, fallingTween] = this._controllers.sticksController.stopGrowing();
         let winDistRange = this._controllers.platformsController.winDistRange;
         if (stickLength >= winDistRange[0] && stickLength <= winDistRange[1]){
-            this.step();
+            fallingTween
+                .call(() => {
+                    this.step();
+                })
+                .start();
         }
         else {
-            this.GameStart();
+            fallingTween
+                .call(() => {
+                    this.GameStart();
+                })
+                .start();
         }
     }
 
     step() {
-        this._controllers.platformsController.step();
+        this._controllers.sticksController.distToMoveLast = this._controllers.platformsController.currentDistance;
+        let movePlatformsTween = this._controllers.platformsController.step();
         this._controllers.sticksController.startStickPosition = this._controllers.platformsController.platformEnd;
-        this._controllers.sticksController.step();
+        let moveSticksTween = this._controllers.sticksController.step();
+        
+        moveSticksTween
+            .start();
+        
+        movePlatformsTween[0] = movePlatformsTween[0].call(() => {this.inputLocked = false;});
+        movePlatformsTween.forEach(tween => {
+            tween.start();
+        });
     }
 }

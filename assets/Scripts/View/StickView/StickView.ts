@@ -25,6 +25,7 @@ export default class StickView extends cc.Component {
         if (this.base === null || this._fieldSize === null){
             throw new Error("base fields are not defined");
         }
+        this.node.angle = this.base.rotation;
         this.node.width = this.base.length * this._fieldSize.width;
         this.node.setPosition(
             this.base.position.x * this._fieldSize.width, 

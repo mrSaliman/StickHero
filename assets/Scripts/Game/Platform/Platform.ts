@@ -10,7 +10,7 @@ export default class Platform implements IPoolable {
         this._width = value;
         this._dataChanged.emit();
     }
-    private _position: cc.Vec2 = cc.Vec2.ZERO;
+    private _position: cc.Vec2 = new cc.Vec2(1.5, 0);
     public get position(): cc.Vec2 {
         return this._position;
     }
@@ -34,7 +34,7 @@ export default class Platform implements IPoolable {
 
     reset(): void {
         this._isVisible = false;
-        this._position = cc.Vec2.ZERO;
+        this._position = new cc.Vec2(1.5, 0);
         this._width = 0;
         this._dataChanged.emit();
     }

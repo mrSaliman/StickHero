@@ -16,6 +16,15 @@ export default class Stick implements IPoolable {
         this._dataChanged.emit();
     }
 
+    private _rotation: number = 0;
+    public get rotation(): number {
+        return this._rotation;
+    }
+    public set rotation(value: number) {
+        this._rotation = value;
+        this._dataChanged.emit();
+    }
+
     private _position: cc.Vec2 = cc.Vec2.ZERO;
     public get position(): cc.Vec2 {
         return this._position;
@@ -35,6 +44,8 @@ export default class Stick implements IPoolable {
     }
 
     reset() {
+        this._position = cc.Vec2.ZERO;
+        this._rotation = 0;
         this._isVisible = false;
         this._length = 0;
         this._dataChanged.emit();
