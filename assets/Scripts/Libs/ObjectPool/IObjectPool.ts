@@ -1,6 +1,6 @@
-import { IPoolable } from "./IPoolable";
+import IPoolable from "./IPoolable";
 
-export interface IObjectPool<T extends IPoolable> {
+export default interface IObjectPool<T extends IPoolable> {
     get(): T;
     release(obj: T): void;
     size(): number;

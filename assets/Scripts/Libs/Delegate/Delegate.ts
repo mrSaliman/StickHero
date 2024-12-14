@@ -1,6 +1,6 @@
 type Listener<T extends any[]> = (...args: T) => void;
 
-export class Delegate<T extends any[]> {
+export default class Delegate<T extends any[]> {
     private listeners: ((...args: T) => void)[] = [];
 
     on = (listener: Listener<T>): void => {

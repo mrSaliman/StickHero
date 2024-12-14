@@ -1,4 +1,4 @@
-import { Delegate } from "../Libs/Delegate/Delegate";
+import Delegate from "../Libs/Delegate/Delegate";
 
 const {ccclass, property} = cc._decorator;
 

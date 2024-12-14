@@ -1,5 +1,5 @@
-import { Platform } from "../../Game/Platform/Platform";
-import { PlatformsController } from "../../Game/Platform/PlatformsController";
+import Platform from "../../Game/Platform/Platform";
+import PlatformsController from "../../Game/Platform/PlatformsController";
 import PlatformView from "./PlatformView";
 
 const {ccclass, property} = cc._decorator;

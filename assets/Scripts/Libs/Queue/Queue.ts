@@ -1,4 +1,6 @@
-class Queue<T> implements IQueue<T> {
+import IQueue from "./IQueue";
+
+export default class Queue<T> implements IQueue<T> {
     private storage: T[] = [];
 
     enqueue(item: T): void {

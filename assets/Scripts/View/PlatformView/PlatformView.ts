@@ -1,11 +1,9 @@
-import { Platform } from "../../Game/Platform/Platform";
+import Platform from "../../Game/Platform/Platform";
 
 const {ccclass, property} = cc._decorator;
 
 @ccclass
 export default class PlatformView extends cc.Component {
-    
-
     private _fieldSize: cc.Size = null;
     public set fieldSize(value: cc.Size) {
         this._fieldSize = value;

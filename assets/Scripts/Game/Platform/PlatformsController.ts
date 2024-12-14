@@ -1,19 +1,30 @@
-import { Delegate } from "../../Libs/Delegate/Delegate";
-import { IObjectPool } from "../../Libs/ObjectPool/IObjectPool";
-import { ObjectPool } from "../../Libs/ObjectPool/ObjectPool";
-import { RandUtil } from "../../Libs/RandUtil/RandUtil";
-import { Platform } from "./Platform";
+import Delegate from "../../Libs/Delegate/Delegate";
+import IObjectPool from "../../Libs/ObjectPool/IObjectPool";
+import ObjectPool from "../../Libs/ObjectPool/ObjectPool";
+import RandUtil from "../../Libs/RandUtil/RandUtil";
+import Platform from "./Platform";
 
-export class PlatformsController {
-    private _platformCreated = new Delegate<[Platform]>();
+export default class PlatformsController {
     private startPlatformWidth: number = 0.1;
     private platformSizeRange: [number, number] = [0.05, 1];
     private nextDistanseRange: [number, number] = [0.05, 1];
-
+    
     private currentPlatforms: Platform[] = [];
-
+    
+    private _platformCreated = new Delegate<[Platform]>();
     public get platformCreated() {
         return this._platformCreated;
+    }
+
+    public get winDistRange(): [number, number] {
+        let current = this.currentPlatforms[0];
+        let next = this.currentPlatforms[1];
+        let dist = next.position.x - current.position.x;
+        return [dist - (next.width / 2 + current.width / 2), dist + (next.width / 2 + current.width / 2)]
+    }
+
+    public get platformEnd() : number {
+        return this.currentPlatforms[0].width / 2;
     }
 
     private pool: IObjectPool<Platform> = new ObjectPool<Platform>(() => {

@@ -1,4 +1,4 @@
-export class RandUtil {
+export default class RandUtil {
     /**
      * Generates a random number in the given range [min, max].
      * @param min - The minimum value (inclusive).
