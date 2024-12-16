@@ -1,10 +1,14 @@
 import UserInput from "../Input/UserInput"
+import CameraController from "./Camera/CameraController";
 import PlatformsController from "./Platform/PlatformsController"
+import PlayerController from "./Player/PlayerController";
 import SticksController from "./Stick/SticksController";
 
 type ControllerStack = {
     platformsController: PlatformsController,
     sticksController: SticksController,
+    playerController: PlayerController,
+    cameraController: CameraController,
 }
 
 export default class GameManager {
@@ -19,6 +23,8 @@ export default class GameManager {
     private _controllers: ControllerStack = {
         platformsController: new PlatformsController(),
         sticksController: new SticksController(),
+        playerController: new PlayerController(),
+        cameraController: null
     }
     public get controllers(): ControllerStack {
         return this._controllers
@@ -30,9 +36,12 @@ export default class GameManager {
                 this.inputLocked = false;
             })
             .start();
-        this._controllers.sticksController.startStickPosition = this._controllers.platformsController.platformEnd;
-        this._controllers.sticksController.distToMoveLast = this._controllers.platformsController.currentDistance;
-        this._controllers.sticksController.reset();
+        
+        let currentPlatform = this._controllers.platformsController.current;
+
+        this._controllers.sticksController.resetWithPosition(currentPlatform.position.x + currentPlatform.width / 2);
+        this._controllers.playerController.reset();
+        this._controllers.cameraController.reset();
     }
 
     onTouchStart(){
@@ -64,14 +73,16 @@ export default class GameManager {
     }
 
     step() {
-        this._controllers.sticksController.distToMoveLast = this._controllers.platformsController.currentDistance;
-        let movePlatformsTween = this._controllers.platformsController.step();
-        this._controllers.sticksController.startStickPosition = this._controllers.platformsController.platformEnd;
-        let moveSticksTween = this._controllers.sticksController.step();
-        
-        moveSticksTween
+        let currentPlatform = this._controllers.platformsController.current;
+        let nextPlatform = this._controllers.platformsController.next;
+        this._controllers.cameraController.step(
+            currentPlatform.width / 2 + 
+            (nextPlatform.position.x - currentPlatform.position.x) - 
+            nextPlatform.width / 2
+        )
             .start();
-        
+        let movePlatformsTween = this._controllers.platformsController.step();
+        this._controllers.sticksController.step(nextPlatform.position.x + nextPlatform.width / 2);
         movePlatformsTween[0] = movePlatformsTween[0].call(() => {this.inputLocked = false;});
         movePlatformsTween.forEach(tween => {
             tween.start();

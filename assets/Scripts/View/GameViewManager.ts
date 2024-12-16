@@ -1,3 +1,4 @@
+import CameraController from "../Game/Camera/CameraController";
 import GameManager from "../Game/GameManager";
 import UserInput from "../Input/UserInput";
 import PlatformsViewController from "./PlatformView/PlatformsViewController";
@@ -18,22 +19,28 @@ export default class GameViewManager extends cc.Component {
     @property(cc.Node)
     inputNode: cc.Node = null;
 
+    @property(cc.Node)
+    cameraNode: cc.Node = null
+
     protected onLoad(): void {
-        if (this.controllersNode === null || this.inputNode === null){
+        if (this.controllersNode === null || this.inputNode === null || this.cameraNode === null){
             throw new Error("links missing");
         }
         
         this.gameManager = new GameManager(this.inputNode.getComponent(UserInput));
         let stack = this.gameManager.controllers;
+        stack.cameraController = new CameraController(this.cameraNode, cc.view.getDesignResolutionSize().width)
+
         this.platformsViewController = this.controllersNode.getComponent(PlatformsViewController);
         this.sticksViewController = this.controllersNode.getComponent(SticksViewController);
+
         this.onWindowChanged();
         this.platformsViewController.init(stack.platformsController);
         this.sticksViewController.init(stack.sticksController)
     }
 
     private onWindowChanged(){
-        let size = cc.view.getDesignResolutionSize(); //cc.view.getCanvasSize();
+        let size = cc.view.getDesignResolutionSize();
         this.platformsViewController.updateFieldSize(size);
         this.sticksViewController.updateFieldSize(size);
     }
