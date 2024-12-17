@@ -12,9 +12,10 @@ type ControllerStack = {
 }
 
 export default class GameManager {
-    constructor(input: UserInput) {
+    constructor(input: UserInput, cameraNode: cc.Node, moveModifier: number) {
         input.TouchStarted.on(() => this.onTouchStart());
         input.TouchEnded.on(() => this.onTouchEnd());
+        this._controllers.cameraController = new CameraController(cameraNode, moveModifier);
     }
 
     private inputLocked: boolean = false;
@@ -40,7 +41,7 @@ export default class GameManager {
         let currentPlatform = this._controllers.platformsController.current;
 
         this._controllers.sticksController.resetWithPosition(currentPlatform.position.x + currentPlatform.width / 2);
-        this._controllers.playerController.reset();
+        this._controllers.playerController.resetWithPosition(currentPlatform.position.x + currentPlatform.width / 2);
         this._controllers.cameraController.reset();
     }
 
@@ -54,19 +55,33 @@ export default class GameManager {
         if (this.inputLocked || !this.inputStarted) return;
         this.inputLocked = true;
         this.inputStarted = false;
-        let [stickLength, fallingTween] = this._controllers.sticksController.stopGrowing();
+        let stickLength = this._controllers.sticksController.stopGrowing();
         let winDistRange = this._controllers.platformsController.winDistRange;
         if (stickLength >= winDistRange[0] && stickLength <= winDistRange[1]){
-            fallingTween
+            this._controllers.sticksController.fallingTween
                 .call(() => {
-                    this.step();
+                    this._controllers.playerController.getMovementTween(winDistRange[1], 0.5)
+                    .call(() => {
+                        this.step();
+                    })
+                    .start();
                 })
                 .start();
         }
         else {
-            fallingTween
+            this._controllers.sticksController.fallingTween
                 .call(() => {
-                    this.GameStart();
+                    this._controllers.playerController.getMovementTween(stickLength, 0.5)
+                    .call(() => {
+                        this._controllers.playerController.looseTween
+                            .call(() => {
+                                this.GameStart();
+                            })
+                            .start();
+                        this._controllers.sticksController.fallingTween
+                            .start();
+                    })
+                    .start();
                 })
                 .start();
         }

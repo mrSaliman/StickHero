@@ -6,12 +6,17 @@ export default class SticksController extends BaseController<Stick> {
     private growingStick: Stick;
     private tween: cc.Tween<Stick>;
 
+    public get fallingTween(): cc.Tween<Stick> {
+        return cc.tween(this.growingStick)
+            .by(0.5, { rotation: -90 }, { easing: "bounceOut" });
+    }
+
     constructor() {
         super(() => new Stick());
     }
 
     public resetWithPosition(stickPosition: number): void {
-        super.reset(); // Вызов базового метода reset
+        super.reset();
         const stick = this.getNextObject();
         this.setupStick(stick, stickPosition);
     }
@@ -31,7 +36,7 @@ export default class SticksController extends BaseController<Stick> {
         stick.isVisible = true;
 
         this.tween = cc.tween(stick)
-            .by(2, { length: 1 })
+            .by(1, { length: 1 })
             .repeatForever();
 
         this.growingStick = stick;
@@ -41,10 +46,8 @@ export default class SticksController extends BaseController<Stick> {
         this.tween.start();
     }
 
-    public stopGrowing(): [number, cc.Tween<Stick>] {
+    public stopGrowing(): number {
         this.tween.stop();
-        const fallingTween = cc.tween(this.growingStick)
-            .to(0.5, { rotation: 0 }, { easing: "bounceOut" });
-        return [this.growingStick.length, fallingTween];
+        return this.growingStick.length;
     }
 }

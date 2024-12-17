@@ -1,47 +1,39 @@
-import Delegate from "../../Libs/Delegate/Delegate";
-import IObjectPool from "../../Libs/ObjectPool/IObjectPool";
-import ObjectPool from "../../Libs/ObjectPool/ObjectPool";
+import BaseController from "../BaseController";
 import Player from "./Player";
 
-export default class PlayerController {
-    public startPlayerPosition: number = 0;
-    public nextPlayerPosition: number = 0;
-    public distToMoveLast: number = 0;
-    movingLeftTime: number = 0.2;
-    playerWidth: number = 0.05
+
+export default class PlayerController extends BaseController<Player> {
     
+    public playerWidth: number = 0.05;
     private currentPlayer: Player;
-    tween: cc.Tween<Player>;
-    
-    private _playerCreated = new Delegate<[Player]>();
-    public get playerCreated() {
-        return this._playerCreated;
+    private _looseTween: cc.Tween<Player>;
+    public get looseTween(): cc.Tween<Player> {
+        return this._looseTween;
     }
 
-    private pool: IObjectPool<Player> = new ObjectPool<Player>(() => {
-        let player = new Player;
-        this._playerCreated.emit(player);
-        return player;
-    });
-
-    public reset(): void {
-        if (this.currentPlayer !== undefined) this.pool.release(this.currentPlayer);
-        this.currentPlayer = this.pool.get();
-        this.setupPlayer(this.currentPlayer);
+    constructor() {
+        super(() => new Player());
     }
 
-    public step(): cc.Tween<Player> {
+    public resetWithPosition(position: number): void {
+        super.reset();
+        this.currentPlayer = this.getNextObject();
+        this.setupPlayer(this.currentPlayer, position);
+    }
+
+    public getMovementTween(distance: number, speed: number): cc.Tween<Player> {
+        distance = Math.min(Math.max(distance, this.playerWidth), 1);
         return cc.tween(this.currentPlayer)
-                    .by(this.movingLeftTime, {position: new cc.Vec2(-this.distToMoveLast, 0)});
+            .by(distance / speed, { position: cc.v2(distance, 0) });
     }
 
-    private setupPlayer(player: Player){
-        player.position = new cc.Vec2(this.startPlayerPosition - this.playerWidth / 2, 0);
+    private setupPlayer(player: Player, position: number): void {
+        player.position = cc.v2(position - this.playerWidth / 2, 0);
         player.width = this.playerWidth;
+        player.isMirrored = false;
         player.isVisible = true;
 
-        this.tween = cc.tween(player)
-            .by(2, {position: new cc.Vec2(this.distToMoveLast)})
-            .repeatForever();
+        this._looseTween = cc.tween(player)
+            .by(1, { position: cc.v2(0, -1) });
     }
 }
