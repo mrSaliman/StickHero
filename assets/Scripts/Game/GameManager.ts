@@ -1,5 +1,6 @@
 import UserInput from "../Input/UserInput"
 import CameraController from "./Camera/CameraController";
+import ParallaxController from "./Parallax/ParallaxController";
 import PlatformsController from "./Platform/PlatformsController"
 import PlayerController from "./Player/PlayerController";
 import SticksController from "./Stick/SticksController";
@@ -9,13 +10,15 @@ type ControllerStack = {
     sticksController: SticksController,
     playerController: PlayerController,
     cameraController: CameraController,
+    parallaxController: ParallaxController
 }
 
 export default class GameManager {
-    constructor(input: UserInput, cameraNode: cc.Node, moveModifier: number) {
+    constructor(input: UserInput, cameraNode: cc.Node, moveModifier: number, parallaxSize: number) {
         input.TouchStarted.on(() => this.onTouchStart());
         input.TouchEnded.on(() => this.onTouchEnd());
         this._controllers.cameraController = new CameraController(cameraNode, moveModifier);
+        this._controllers.parallaxController = new ParallaxController(parallaxSize);
     }
 
     private inputLocked: boolean = false;
@@ -25,7 +28,8 @@ export default class GameManager {
         platformsController: new PlatformsController(),
         sticksController: new SticksController(),
         playerController: new PlayerController(),
-        cameraController: null
+        cameraController: null,
+        parallaxController: null,
     }
     public get controllers(): ControllerStack {
         return this._controllers
@@ -43,6 +47,7 @@ export default class GameManager {
         this._controllers.sticksController.resetWithPosition(currentPlatform.position.x + currentPlatform.width / 2);
         this._controllers.playerController.resetWithPosition(currentPlatform.position.x + currentPlatform.width / 2);
         this._controllers.cameraController.reset();
+        this._controllers.parallaxController.reset();
     }
 
     onTouchStart(){
@@ -90,12 +95,14 @@ export default class GameManager {
     step() {
         let currentPlatform = this._controllers.platformsController.current;
         let nextPlatform = this._controllers.platformsController.next;
-        this._controllers.cameraController.step(
-            currentPlatform.width / 2 + 
-            (nextPlatform.position.x - currentPlatform.position.x) - 
-            nextPlatform.width / 2
-        )
+        let cameraMoveDist = currentPlatform.width / 2 + (nextPlatform.position.x - currentPlatform.position.x) - nextPlatform.width / 2;
+        this._controllers.cameraController.step(cameraMoveDist)
             .start();
+
+        this._controllers.parallaxController.step(cameraMoveDist).forEach(t => {
+            t.start();
+        });
+
         let movePlatformsTween = this._controllers.platformsController.step();
         this._controllers.sticksController.step(nextPlatform.position.x + nextPlatform.width / 2);
         movePlatformsTween[0] = movePlatformsTween[0].call(() => {this.inputLocked = false;});
