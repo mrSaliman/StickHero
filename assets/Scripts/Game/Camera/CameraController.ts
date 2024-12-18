@@ -18,7 +18,7 @@ export default class CameraController {
         this.cameraNode.setPosition(cc.v2());
     }
 
-    public step(moveDistance: number): cc.Tween<cc.Node> {
+    public move(moveDistance: number): cc.Tween<cc.Node> {
         return cc.tween(this.cameraNode)
             .by(this.moveCameraTime, {position: cc.v3(moveDistance * this.moveModifier, 0, 0)})
     }

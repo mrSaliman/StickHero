@@ -27,6 +27,14 @@ export default class PlatformsController extends BaseController<Platform> {
         const dist = next.position.x - current.position.x;
         return [dist - (next.width / 2 + current.width / 2), dist + next.width / 2 - current.width / 2];
     }
+    
+    public resetWithPosition(startPos: number): cc.Tween<Platform> {
+        super.reset();
+        const current = this.getNextObject();
+        const next = this.getNextObject();
+        this.configStartPlatform(current, startPos);
+        return this.configNextPlatform(next, current);
+    }
 
     public reset(): cc.Tween<Platform> {
         super.reset();
@@ -50,8 +58,8 @@ export default class PlatformsController extends BaseController<Platform> {
         ];
     }
 
-    private configStartPlatform(platform: Platform): void {
-        platform.setAllData(this.startPlatformWidth, cc.v2(this.startPlatformWidth / 2, 0), true);
+    private configStartPlatform(platform: Platform, startPos = 0): void {
+        platform.setAllData(this.startPlatformWidth, cc.v2(startPos == 0 ? this.startPlatformWidth / 2: startPos, 0), true);
     }
 
     private configNextPlatform(next: Platform, prev: Platform): cc.Tween<Platform> {

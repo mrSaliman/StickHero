@@ -15,20 +15,20 @@ export default class PlayerController extends BaseController<Player> {
         super(() => new Player());
     }
 
-    public resetWithPosition(position: number): void {
+    public resetWithPosition(position: number, edge: boolean): void {
         super.reset();
         this.currentPlayer = this.getNextObject();
-        this.setupPlayer(this.currentPlayer, position);
+        this.setupPlayer(this.currentPlayer, position, edge);
     }
 
-    public getMovementTween(distance: number, speed: number): cc.Tween<Player> {
+    public getMovementTween(distance: number, speed: number, shift: boolean): cc.Tween<Player> {
         distance = Math.min(Math.max(distance, this.playerWidth), 1);
         return cc.tween(this.currentPlayer)
-            .by(distance / speed, { position: cc.v2(distance, 0) });
+            .by(distance / speed, { position: cc.v2(distance - (shift ? (this.playerWidth / 2) : 0), 0) });
     }
 
-    private setupPlayer(player: Player, position: number): void {
-        player.position = cc.v2(position - this.playerWidth / 2, 0);
+    private setupPlayer(player: Player, position: number, edge: boolean): void {
+        player.position = cc.v2(position - (edge ? (this.playerWidth / 2) : 0), 0);
         player.width = this.playerWidth;
         player.isMirrored = false;
         player.isVisible = true;

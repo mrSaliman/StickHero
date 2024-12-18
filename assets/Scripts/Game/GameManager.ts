@@ -1,16 +1,23 @@
 import UserInput from "../Input/UserInput"
+import Delegate from "../Libs/Delegate/Delegate";
 import CameraController from "./Camera/CameraController";
 import ParallaxController from "./Parallax/ParallaxController";
 import PlatformsController from "./Platform/PlatformsController"
 import PlayerController from "./Player/PlayerController";
 import SticksController from "./Stick/SticksController";
 
-type ControllerStack = {
+export type ControllerStack = {
     platformsController: PlatformsController,
     sticksController: SticksController,
     playerController: PlayerController,
     cameraController: CameraController,
     parallaxController: ParallaxController
+}
+
+export enum GameState {
+    Prepare,
+    Game,
+    Loss
 }
 
 export default class GameManager {
@@ -24,6 +31,20 @@ export default class GameManager {
     private inputLocked: boolean = false;
     private inputStarted: boolean = false;
 
+    private _currentGameState: GameState = GameState.Prepare;
+    public get currentGameState(): GameState {
+        return this._currentGameState;
+    }
+    public set currentGameState(value: GameState) {
+        this._currentGameState = value;
+        this._stateChanged.emit();
+    }
+
+    private _stateChanged = new Delegate();
+    public get stateChanged() {
+        return this._stateChanged;
+    }
+
     private _controllers: ControllerStack = {
         platformsController: new PlatformsController(),
         sticksController: new SticksController(),
@@ -35,7 +56,40 @@ export default class GameManager {
         return this._controllers
     }
 
-    public GameStart(){
+    private startTweens: cc.Tween[] = [];
+
+    public prepare() {
+        this.currentGameState = GameState.Prepare;
+        this.inputLocked = true;
+        this.startTweens.push(
+            this._controllers.platformsController.resetWithPosition(0.5)
+            .call(() => {
+                this.inputLocked = false;
+            })
+        );
+        let currentPlatform = this._controllers.platformsController.current;
+
+        this._controllers.sticksController.resetWithPosition(currentPlatform.position.x + currentPlatform.width / 2);
+        this._controllers.playerController.resetWithPosition(currentPlatform.position.x, false);
+        this.startTweens.push(this._controllers.playerController.getMovementTween(currentPlatform.width / 2, 0.5, true));
+        this._controllers.cameraController.reset();
+        this._controllers.parallaxController.reset();
+        this.startTweens.push(this._controllers.cameraController.move(currentPlatform.position.x - currentPlatform.width / 2));
+        this.startTweens.concat(this._controllers.parallaxController.move(currentPlatform.position.x - currentPlatform.width / 2));
+    }
+
+    public start() {
+        if (this.currentGameState !== GameState.Prepare) return;
+        this.currentGameState = GameState.Game;
+        this.startTweens.forEach(t => {
+            t.start();
+        });
+        this.startTweens = [];
+    }
+
+    public restart(){
+        if (this.currentGameState !== GameState.Loss) return;
+        this.currentGameState = GameState.Game;
         this._controllers.platformsController.reset()
             .call(() => {
                 this.inputLocked = false;
@@ -45,7 +99,7 @@ export default class GameManager {
         let currentPlatform = this._controllers.platformsController.current;
 
         this._controllers.sticksController.resetWithPosition(currentPlatform.position.x + currentPlatform.width / 2);
-        this._controllers.playerController.resetWithPosition(currentPlatform.position.x + currentPlatform.width / 2);
+        this._controllers.playerController.resetWithPosition(currentPlatform.position.x + currentPlatform.width / 2, true);
         this._controllers.cameraController.reset();
         this._controllers.parallaxController.reset();
     }
@@ -65,7 +119,7 @@ export default class GameManager {
         if (stickLength >= winDistRange[0] && stickLength <= winDistRange[1]){
             this._controllers.sticksController.fallingTween
                 .call(() => {
-                    this._controllers.playerController.getMovementTween(winDistRange[1], 0.5)
+                    this._controllers.playerController.getMovementTween(winDistRange[1], 0.5, false)
                     .call(() => {
                         this.step();
                     })
@@ -76,11 +130,11 @@ export default class GameManager {
         else {
             this._controllers.sticksController.fallingTween
                 .call(() => {
-                    this._controllers.playerController.getMovementTween(stickLength, 0.5)
+                    this._controllers.playerController.getMovementTween(stickLength, 0.5, false)
                     .call(() => {
                         this._controllers.playerController.looseTween
                             .call(() => {
-                                this.GameStart();
+                                this.currentGameState = GameState.Loss;
                             })
                             .start();
                         this._controllers.sticksController.fallingTween
@@ -96,10 +150,10 @@ export default class GameManager {
         let currentPlatform = this._controllers.platformsController.current;
         let nextPlatform = this._controllers.platformsController.next;
         let cameraMoveDist = currentPlatform.width / 2 + (nextPlatform.position.x - currentPlatform.position.x) - nextPlatform.width / 2;
-        this._controllers.cameraController.step(cameraMoveDist)
+        this._controllers.cameraController.move(cameraMoveDist)
             .start();
 
-        this._controllers.parallaxController.step(cameraMoveDist).forEach(t => {
+        this._controllers.parallaxController.move(cameraMoveDist).forEach(t => {
             t.start();
         });
 

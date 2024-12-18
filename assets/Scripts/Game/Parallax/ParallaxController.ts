@@ -26,7 +26,7 @@ export default class ParallaxController extends BaseController<Parallax> {
         });
     }
 
-    public step(distance: number): cc.Tween<Parallax>[] {
+    public move(distance: number): cc.Tween<Parallax>[] {
         let tweenArr: cc.Tween<Parallax>[] = []
         let modifier = this.depthModifier;
         for (let i = 0; i < this.parallaxSize; i++) {

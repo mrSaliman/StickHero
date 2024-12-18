@@ -1,0 +1,38 @@
+{
+  "ver": "2.3.7",
+  "uuid": "80f4db17-0d89-4c59-abc5-5d5f358c3948",
+  "importer": "texture",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 1408,
+  "height": 1280,
+  "platformSettings": {},
+  "subMetas": {
+    "foni-papik-pro-3xrn-p-kartinki-krasnii-kruzhok-na-prozrachnom-fo-2": {
+      "ver": "1.0.6",
+      "uuid": "feacf6a0-fe0e-4789-a384-5e9fd5dafd91",
+      "importer": "sprite-frame",
+      "rawTextureUuid": "80f4db17-0d89-4c59-abc5-5d5f358c3948",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 2,
+      "trimY": 2,
+      "width": 800,
+      "height": 800,
+      "rawWidth": 804,
+      "rawHeight": 804,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}
