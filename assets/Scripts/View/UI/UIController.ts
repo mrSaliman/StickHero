@@ -1,3 +1,6 @@
+import Label from "../../Game/UI/Label";
+import LabelView from "./LabelView";
+
 const { ccclass, property } = cc._decorator;
 
 @ccclass
@@ -8,6 +11,9 @@ export default class UIController extends cc.Component {
 
     @property(cc.Node)
     gameUINode: cc.Node = null;
+
+    @property(LabelView)
+    gameScore: LabelView = null;
 
     @property(cc.Node)
     loseUINode: cc.Node = null;
@@ -20,10 +26,18 @@ export default class UIController extends cc.Component {
     private animationTime = 0.5;
 
     protected onLoad(): void {
-        if (this.uiCoverNode === null || this.loseUINode === null || this.gameUINode === null || this.startUINode === null){
+        if (this.uiCoverNode === null || 
+            this.loseUINode === null || 
+            this.gameUINode === null || 
+            this.startUINode === null || 
+            this.gameScore === null){
             throw new Error("links missing");
         }
         this.uiCover = this.uiCoverNode.getComponent(cc.BlockInputEvents);
+    }
+
+    public initScoreLabel(base: Label){
+        this.gameScore.init(base);
     }
 
     disableStartUI() {

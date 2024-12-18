@@ -52,6 +52,8 @@ export default class GameViewManager extends cc.Component {
         this.sticksViewController.init(stack.sticksController);
         this.playerViewController.init(stack.playerController);
         this.parallaxViewController.init(stack.parallaxController);
+
+        this.uiController.initScoreLabel(this.gameManager.currentScoreLabel);
     }
 
     protected start(): void {

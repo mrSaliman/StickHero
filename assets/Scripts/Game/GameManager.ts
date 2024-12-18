@@ -5,6 +5,7 @@ import ParallaxController from "./Parallax/ParallaxController";
 import PlatformsController from "./Platform/PlatformsController"
 import PlayerController from "./Player/PlayerController";
 import SticksController from "./Stick/SticksController";
+import Label from "./UI/Label";
 
 export type ControllerStack = {
     platformsController: PlatformsController,
@@ -38,6 +39,20 @@ export default class GameManager {
     public set currentGameState(value: GameState) {
         this._currentGameState = value;
         this._stateChanged.emit();
+    }
+
+    private _currentScoreLabel = new Label();
+    public get currentScoreLabel() {
+        return this._currentScoreLabel;
+    }
+
+    private _score: number = 0;
+    public get score(): number {
+        return this._score;
+    }
+    public set score(value: number) {
+        this._score = value;
+        this._currentScoreLabel.content = value.toString();
     }
 
     private _stateChanged = new Delegate();
@@ -85,6 +100,7 @@ export default class GameManager {
             t.start();
         });
         this.startTweens = [];
+        this.score = 0;
     }
 
     public restart(){
@@ -102,6 +118,7 @@ export default class GameManager {
         this._controllers.playerController.resetWithPosition(currentPlatform.position.x + currentPlatform.width / 2, true);
         this._controllers.cameraController.reset();
         this._controllers.parallaxController.reset();
+        this.score = 0;
     }
 
     onTouchStart(){
@@ -147,6 +164,7 @@ export default class GameManager {
     }
 
     step() {
+        this.score++;
         let currentPlatform = this._controllers.platformsController.current;
         let nextPlatform = this._controllers.platformsController.next;
         let cameraMoveDist = currentPlatform.width / 2 + (nextPlatform.position.x - currentPlatform.position.x) - nextPlatform.width / 2;
