@@ -15,6 +15,12 @@ export default class UIController extends cc.Component {
     @property(LabelView)
     gameScore: LabelView = null;
 
+    @property(LabelView)
+    resultGameScore: LabelView = null;
+
+    @property(LabelView)
+    perfectLabel: LabelView = null;
+
     @property(cc.Node)
     loseUINode: cc.Node = null;
 
@@ -30,7 +36,10 @@ export default class UIController extends cc.Component {
             this.loseUINode === null || 
             this.gameUINode === null || 
             this.startUINode === null || 
-            this.gameScore === null){
+            this.gameScore === null ||
+            this.resultGameScore === null ||
+            this.perfectLabel === null
+        ){
             throw new Error("links missing");
         }
         this.uiCover = this.uiCoverNode.getComponent(cc.BlockInputEvents);
@@ -38,6 +47,11 @@ export default class UIController extends cc.Component {
 
     public initScoreLabel(base: Label){
         this.gameScore.init(base);
+        this.resultGameScore.init(base);
+    }
+
+    public initPerfectLabel(base: Label){
+        this.perfectLabel.init(base);
     }
 
     disableStartUI() {

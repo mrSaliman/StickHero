@@ -13,6 +13,7 @@ export default class LabelView extends BaseView<Label> {
         if (this.base === null) {
             throw new Error("Base is not defined");
         }
+        this.node.opacity = this.base.opacity;
         this.targetLabel.string = this.base.content;
     }
 

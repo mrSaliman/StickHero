@@ -54,6 +54,7 @@ export default class GameViewManager extends cc.Component {
         this.parallaxViewController.init(stack.parallaxController);
 
         this.uiController.initScoreLabel(this.gameManager.currentScoreLabel);
+        this.uiController.initPerfectLabel(this.gameManager.currentPerfectLabel);
     }
 
     protected start(): void {

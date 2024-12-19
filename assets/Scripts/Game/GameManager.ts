@@ -2,7 +2,7 @@ import UserInput from "../Input/UserInput"
 import Delegate from "../Libs/Delegate/Delegate";
 import CameraController from "./Camera/CameraController";
 import ParallaxController from "./Parallax/ParallaxController";
-import PlatformsController from "./Platform/PlatformsController"
+import PlatformsController, { FitResult } from "./Platform/PlatformsController"
 import PlayerController from "./Player/PlayerController";
 import SticksController from "./Stick/SticksController";
 import Label from "./UI/Label";
@@ -27,6 +27,7 @@ export default class GameManager {
         input.TouchEnded.on(() => this.onTouchEnd());
         this._controllers.cameraController = new CameraController(cameraNode, moveModifier);
         this._controllers.parallaxController = new ParallaxController(parallaxSize);
+        this._currentScoreLabel.opacity = 255;
     }
 
     private inputLocked: boolean = false;
@@ -44,6 +45,11 @@ export default class GameManager {
     private _currentScoreLabel = new Label();
     public get currentScoreLabel() {
         return this._currentScoreLabel;
+    }
+
+    private _currentPerfectLabel = new Label();
+    public get currentPerfectLabel() {
+        return this._currentPerfectLabel;
     }
 
     private _score: number = 0;
@@ -101,6 +107,7 @@ export default class GameManager {
         });
         this.startTweens = [];
         this.score = 0;
+        this._currentPerfectLabel.content = "PERFECT";
     }
 
     public restart(){
@@ -132,19 +139,9 @@ export default class GameManager {
         this.inputLocked = true;
         this.inputStarted = false;
         let stickLength = this._controllers.sticksController.stopGrowing();
+        let fitResult = this._controllers.platformsController.fitToWin(stickLength);
         let winDistRange = this._controllers.platformsController.winDistRange;
-        if (stickLength >= winDistRange[0] && stickLength <= winDistRange[1]){
-            this._controllers.sticksController.fallingTween
-                .call(() => {
-                    this._controllers.playerController.getMovementTween(winDistRange[1], 0.5, false)
-                    .call(() => {
-                        this.step();
-                    })
-                    .start();
-                })
-                .start();
-        }
-        else {
+        if (fitResult === FitResult.Lose) {
             this._controllers.sticksController.fallingTween
                 .call(() => {
                     this._controllers.playerController.getMovementTween(stickLength, 0.5, false)
@@ -161,10 +158,25 @@ export default class GameManager {
                 })
                 .start();
         }
+        else {
+            this._controllers.sticksController.fallingTween
+                .call(() => {
+                    if (fitResult === FitResult.Perfect) {
+                        this._controllers.platformsController.showPlusOne();
+                        this.showPerfect();
+                    }
+                    this._controllers.playerController.getMovementTween(winDistRange[1], 0.5, false)
+                    .call(() => {
+                        this.step();
+                        this.score += fitResult === FitResult.Perfect ? 2 : 1;
+                    })
+                    .start();
+                })
+                .start();
+        }
     }
 
     step() {
-        this.score++;
         let currentPlatform = this._controllers.platformsController.current;
         let nextPlatform = this._controllers.platformsController.next;
         let cameraMoveDist = currentPlatform.width / 2 + (nextPlatform.position.x - currentPlatform.position.x) - nextPlatform.width / 2;
@@ -181,5 +193,13 @@ export default class GameManager {
         movePlatformsTween.forEach(tween => {
             tween.start();
         });
+    }
+
+    private showPerfect(){
+        cc.tween(this._currentPerfectLabel)
+            .to(0.2, {opacity: 255})
+            .delay(0.3)
+            .to(0.5, {opacity: 0})
+            .start();
     }
 }

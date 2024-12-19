@@ -1,7 +1,7 @@
 import BaseObject from "../BaseObject";
 
 export default class Label extends BaseObject {
-    private _content: string = "0";
+    private _content: string = "";
     public get content(): string {
         return this._content;
     }
@@ -20,7 +20,7 @@ export default class Label extends BaseObject {
     }
 
     reset() {
-        this._content = "0";
+        this._content = "";
         this._opacity = 0;
         this._dataChanged.emit();
     }
