@@ -21,8 +21,9 @@ export default class PlayerController extends BaseController<Player> {
         this.setupPlayer(this.currentPlayer, position, edge);
     }
 
-    public getMovementTween(distance: number, speed: number, shift: boolean): cc.Tween<Player> {
+    public getMovementTween(distance: number, speed: number, shift: boolean, rightPlatformEdge: number): cc.Tween<Player> {
         distance = Math.min(Math.max(distance, this.playerWidth), 1);
+        if (distance < 1 && distance > rightPlatformEdge) distance = rightPlatformEdge + this.playerWidth;
         return cc.tween(this.currentPlayer)
             .by(distance / speed, { position: cc.v2(distance - (shift ? (this.playerWidth / 2) : 0), 0) });
     }
