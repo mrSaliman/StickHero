@@ -6,6 +6,7 @@ import PlayerViewController from './PlayerView/PlayerViewController';
 import ParallaxViewController from './Background/ParallaxViewController';
 import UIController from "./UI/UIController";
 import GameStateManager from "../Game/GameManager/GameStateManager";
+import CollectablesViewController from "./CollectableView/CollectablesViewController";
 
 const { ccclass, property } = cc._decorator;
 
@@ -17,6 +18,7 @@ export default class GameViewManager extends cc.Component {
     private sticksViewController: SticksViewController;
     private playerViewController: PlayerViewController;
     private parallaxViewController: ParallaxViewController;
+    private collectablesViewController: CollectablesViewController;
     private stateManager: GameStateManager;
 
     @property(cc.Node)
@@ -74,6 +76,7 @@ export default class GameViewManager extends cc.Component {
         this.sticksViewController = this.getController(SticksViewController);
         this.playerViewController = this.getController(PlayerViewController);
         this.parallaxViewController = this.getController(ParallaxViewController);
+        this.collectablesViewController = this.getController(CollectablesViewController);
 
         this.updateWindowSize();
         const parallaxSize = this.parallaxViewController.loadParallaxNodes();
@@ -87,6 +90,7 @@ export default class GameViewManager extends cc.Component {
         this.sticksViewController.init(stack.sticksController);
         this.playerViewController.init(stack.playerController);
         this.parallaxViewController.init(stack.parallaxController);
+        this.collectablesViewController.init(stack.collectablesController);
     }
 
     private initializeUI(): void {
@@ -103,6 +107,7 @@ export default class GameViewManager extends cc.Component {
         this.platformsViewController.updateFieldSize(designSize);
         this.sticksViewController.updateFieldSize(designSize);
         this.playerViewController.updateFieldSize(designSize);
+        this.collectablesViewController.updateFieldSize(designSize);
 
         const windowSize = cc.view.getCanvasSize();
         const parallaxSize = cc.size(designSize.width, (windowSize.height / windowSize.width) * designSize.width);

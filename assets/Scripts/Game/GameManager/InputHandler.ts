@@ -1,30 +1,34 @@
 import SticksController from "../Stick/SticksController";
 
 export default class InputHandler {
-    private inputLocked: boolean = false;
-    private inputStarted: boolean = false;
+    private stickInputLocked: boolean = false;
+    private stickInputStarted: boolean = false;
 
-    constructor(private sticksController: SticksController, private callback: (stickLength: number) => void) {}
+    constructor(private sticksController: SticksController, private stickCallback: (stickLength: number) => void, private flipCallback: () => void) {}
 
-    public lockInput() {
-        this.inputLocked = true;
+    public lockStickInput() {
+        this.stickInputLocked = true;
     }
 
-    public unlockInput() {
-        this.inputLocked = false;
+    public unlockStickInput() {
+        this.stickInputLocked = false;
     }
 
     public onTouchStart() {
-        if (this.inputLocked) return;
-        this.sticksController.startGrowing();
-        this.inputStarted = true;
+        if (this.stickInputLocked) {
+            this.flipCallback();
+        }
+        else {
+            this.sticksController.startGrowing();
+            this.stickInputStarted = true;
+        }
     }
 
     public onTouchEnd() {
-        if (this.inputLocked || !this.inputStarted) return;
-        this.inputLocked = true;
-        this.inputStarted = false;
+        if (this.stickInputLocked || !this.stickInputStarted) return;
+        this.stickInputLocked = true;
+        this.stickInputStarted = false;
         const stickLength = this.sticksController.stopGrowing();
-        this.callback(stickLength);
+        this.stickCallback(stickLength);
     }
 }

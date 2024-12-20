@@ -1,11 +1,10 @@
 import UserInput from "../../Input/UserInput"
-import Delegate from "../../Libs/Delegate/Delegate";
 import CameraController from "../Camera/CameraController";
+import CollectablesController from "../Collectable/CollectablesController";
 import ParallaxController from "../Parallax/ParallaxController";
 import PlatformsController, { FitResult } from "../Platform/PlatformsController"
-import PlayerController from "../Player/PlayerController";
+import PlayerController, { PlayerState } from "../Player/PlayerController";
 import SticksController from "../Stick/SticksController";
-import Label from "../UI/Label";
 import GameStateManager from "./GameStateManager";
 import InputHandler from "./InputHandler";
 import ScoreManager from "./ScoreManager";
@@ -15,7 +14,8 @@ export type ControllerStack = {
     sticksController: SticksController,
     playerController: PlayerController,
     cameraController: CameraController,
-    parallaxController: ParallaxController
+    parallaxController: ParallaxController,
+    collectablesController: CollectablesController
 }
 
 export enum GameState {
@@ -48,12 +48,14 @@ export default class GameManager {
             sticksController: new SticksController(),
             playerController: new PlayerController(),
             cameraController: new CameraController(cameraNode, moveModifier),
-            parallaxController: new ParallaxController(parallaxSize)
+            parallaxController: new ParallaxController(parallaxSize),
+            collectablesController: new CollectablesController()
         };
 
         this._inputHandler = new InputHandler(
             this.controllers.sticksController,
-            (stickLength) => this.handleStickInput(stickLength)
+            (stickLength) => this.handleStickInput(stickLength),
+            () => this.handleFlipInput()
         );
 
         input.TouchStarted.on(() => this.inputHandler.onTouchStart());
@@ -64,11 +66,11 @@ export default class GameManager {
 
     public prepare() {
         this.stateManager.currentGameState = GameState.Prepare;
-        this.inputHandler.lockInput();
+        this.inputHandler.lockStickInput();
         this.startTweens.push(
             this.controllers.platformsController.resetWithPosition(0.5)
                 .call(() => {
-                    this.inputHandler.unlockInput();
+                    this.inputHandler.unlockStickInput();
                 })
         );
         const currentPlatform = this.controllers.platformsController.current;
@@ -97,7 +99,7 @@ export default class GameManager {
         this.stateManager.currentGameState = GameState.Game;
 
         this.controllers.platformsController.reset().call(() => {
-            this.inputHandler.unlockInput();
+            this.inputHandler.unlockStickInput();
         }).start();
 
         const currentPlatform = this.controllers.platformsController.current;
@@ -115,6 +117,7 @@ export default class GameManager {
         if (fitResult === FitResult.Lose) {
             this._controllers.sticksController.fallingTween
                 .call(() => {
+                    this.controllers.playerController.currentState = PlayerState.Running
                     this._controllers.playerController.getMovementTween(
                         stickLength, 
                         0.5, 
@@ -122,6 +125,7 @@ export default class GameManager {
                         rightPlatformEdge
                     )
                     .call(() => {
+                        this.controllers.playerController.currentState = PlayerState.Standing
                         this._controllers.playerController.looseTween
                             .call(() => {
                                 this.stateManager.currentGameState = GameState.Loss;
@@ -140,6 +144,7 @@ export default class GameManager {
                         this.controllers.platformsController.showPlusOne();
                         this.scoreManager.showPerfect();
                     }
+                    this.controllers.playerController.currentState = PlayerState.Running;
                     this.controllers.playerController.getMovementTween(
                         rightPlatformEdge,
                         0.5,
@@ -147,6 +152,7 @@ export default class GameManager {
                         rightPlatformEdge
                     )
                         .call(() => {
+                            this.controllers.playerController.currentState = PlayerState.Standing;
                             this.step();
                             this.scoreManager.score += fitResult === FitResult.Perfect ? 2 : 1;
                         })
@@ -156,10 +162,20 @@ export default class GameManager {
         }
     }
 
+    handleFlipInput() {
+        if (this.controllers.playerController.currentState === PlayerState.Standing) return;
+        const currentPlayer = this.controllers.playerController.currentPlayer;
+        const currentPlatform = this._controllers.platformsController.current;
+        const nextPlatform = this._controllers.platformsController.next;
+        if (currentPlayer.position.x - currentPlayer.width / 2 < currentPlatform.position.x + currentPlatform.width / 2 ||
+            currentPlayer.position.x + currentPlayer.width / 2 > nextPlatform.position.x - nextPlatform.width / 2) return;
+        currentPlayer.isMirrored = !currentPlayer.isMirrored;
+    }
+
     step() {
-        let currentPlatform = this._controllers.platformsController.current;
-        let nextPlatform = this._controllers.platformsController.next;
-        let cameraMoveDist = currentPlatform.width / 2 + (nextPlatform.position.x - currentPlatform.position.x) - nextPlatform.width / 2;
+        const currentPlatform = this._controllers.platformsController.current;
+        const nextPlatform = this._controllers.platformsController.next;
+        const cameraMoveDist = currentPlatform.width / 2 + (nextPlatform.position.x - currentPlatform.position.x) - nextPlatform.width / 2;
         this._controllers.cameraController.move(cameraMoveDist)
             .start();
 
@@ -167,9 +183,17 @@ export default class GameManager {
             t.start();
         });
 
-        let movePlatformsTween = this._controllers.platformsController.step();
+        const movePlatformsTween = this._controllers.platformsController.step();
+        const distBetween = this._controllers.platformsController.winDistRange[0];
+
+        this._controllers.collectablesController.resetWithSettins(
+            [nextPlatform.position.x + nextPlatform.width / 2, 
+                nextPlatform.position.x + nextPlatform.width / 2 + distBetween], 
+            3
+        )
+
         this._controllers.sticksController.step(nextPlatform.position.x + nextPlatform.width / 2);
-        movePlatformsTween[0] = movePlatformsTween[0].call(() => {this.inputHandler.unlockInput()});
+        movePlatformsTween[0] = movePlatformsTween[0].call(() => {this.inputHandler.unlockStickInput()});
         movePlatformsTween.forEach(tween => {
             tween.start();
         });

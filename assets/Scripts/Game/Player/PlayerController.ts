@@ -1,11 +1,22 @@
 import BaseController from "../BaseController";
 import Player from "./Player";
 
+export enum PlayerState {
+    Standing,
+    Running
+}
 
 export default class PlayerController extends BaseController<Player> {
     
+    currentState: PlayerState = PlayerState.Standing;
     public playerWidth: number = 0.05;
-    private currentPlayer: Player;
+    private _currentPlayer: Player;
+    public get currentPlayer(): Player {
+        return this._currentPlayer;
+    }
+    private set currentPlayer(value: Player) {
+        this._currentPlayer = value;
+    }
     private _looseTween: cc.Tween<Player>;
     public get looseTween(): cc.Tween<Player> {
         return this._looseTween;
@@ -23,7 +34,7 @@ export default class PlayerController extends BaseController<Player> {
 
     public getMovementTween(distance: number, speed: number, shift: boolean, rightPlatformEdge: number): cc.Tween<Player> {
         distance = Math.min(Math.max(distance, this.playerWidth), 1);
-        if (distance < 1 && distance > rightPlatformEdge) distance = rightPlatformEdge + this.playerWidth;
+        if (distance > rightPlatformEdge) distance = Math.max(rightPlatformEdge + this.playerWidth, distance);
         return cc.tween(this.currentPlayer)
             .by(distance / speed, { position: cc.v2(distance - (shift ? (this.playerWidth / 2) : 0), 0) });
     }

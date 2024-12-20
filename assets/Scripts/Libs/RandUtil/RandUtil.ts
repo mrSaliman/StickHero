@@ -18,4 +18,32 @@ export default class RandUtil {
     static getRandomInteger(min: number, max: number): number {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
+
+    static distributeRandomNumbers(
+        n: number,
+        min: number,
+        max: number,
+        minDistance: number
+    ): number[] {
+    const range = max - min;
+    
+    if ((n - 1) * minDistance > range) {
+        throw new Error("The range is too small for placing numbers with a given minimum distance.");
+    }
+    
+    
+    const positions: number[] = [];
+    for (let i = min; i <= max; i += minDistance) {
+        positions.push(i);
+    }
+    
+    const result: number[] = [];
+    for (let i = 0; i < n; i++) {
+        const randomIndex = Math.floor(Math.random() * positions.length);
+        result.push(positions[randomIndex]);
+        positions.splice(randomIndex, 1); 
+    }
+    
+    return result; 
+    }
 }

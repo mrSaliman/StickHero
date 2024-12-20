@@ -11,7 +11,7 @@ export enum FitResult {
 export default class PlatformsController extends BaseController<Platform> {
     private startPlatformWidth: number = 0.2;
     private platformSizeRange: [number, number] = [0.1, 0.5];
-    private nextDistanceRange: [number, number] = [0.05, 1];
+    private nextDistanceRange: [number, number] = [0.1, 1];
     private spawningPlatformTime: number = 0.2;
     private _currentDistance: number = 0;
     private perfectWidth: number = 0.02;
@@ -31,7 +31,7 @@ export default class PlatformsController extends BaseController<Platform> {
     public get winDistRange(): [number, number] {
         const current = this.current;
         const next = this.next;
-        const dist = next.position.x - current.position.x;
+        const dist = this._currentDistance;
         return [dist - (next.width / 2 + current.width / 2), dist + next.width / 2 - current.width / 2];
     }
 
