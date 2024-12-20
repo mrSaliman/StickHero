@@ -16,6 +16,12 @@ export default class ParallaxViewController extends BaseViewController<Parallax,
             this.viewList.push(parallax)
         });
 
+        this.setupScale();
+
+        return this.viewList.length;
+    }
+
+    public setupScale () {
         let maxHeight = 0;
         let maxWidth = 0;
         this.viewList.forEach(parallax => {
@@ -30,8 +36,6 @@ export default class ParallaxViewController extends BaseViewController<Parallax,
         this.viewList.forEach(parallax => {
             parallax.node.scale = currentScale;
         });
-
-        return this.viewList.length;
     }
 
     protected onLoad(): void {

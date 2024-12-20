@@ -37,6 +37,7 @@ export default class GameViewManager extends cc.Component {
         this.validateProperties();
         this.initializeControllers();
         this.initializeUI();
+        cc.view.on('canvas-resize', this.updateWindowSize, this);
     }
 
     protected start(): void {
@@ -112,9 +113,9 @@ export default class GameViewManager extends cc.Component {
         this.collectablesViewController.updateFieldSize(designSize);
 
         const windowSize = cc.view.getCanvasSize();
-        const parallaxSize = cc.size(designSize.width, (windowSize.height / windowSize.width) * designSize.width);
         this.parallaxViewController.currentScreenSize = windowSize;
         this.parallaxViewController.updateFieldSize(designSize);
+        this.parallaxViewController.setupScale();
     }
 
     private onStateChanged(): void {
@@ -126,5 +127,6 @@ export default class GameViewManager extends cc.Component {
 
     protected onDestroy(): void {
         this.stateManager.stateChanged.off(() => this.onStateChanged());
+        cc.view.off('window-resize', this.updateWindowSize, this);
     }
 }

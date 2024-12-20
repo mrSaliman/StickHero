@@ -3225,7 +3225,7 @@
       "__id__": 75
     },
     "_enabled": true,
-    "alignMode": 0,
+    "alignMode": 1,
     "_target": null,
     "_alignFlags": 45,
     "_left": 0,
@@ -4884,7 +4884,7 @@
       "__id__": 52
     },
     "_enabled": true,
-    "alignMode": 0,
+    "alignMode": 1,
     "_target": {
       "__id__": 2
     },
