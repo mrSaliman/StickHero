@@ -39,4 +39,9 @@ export default class CollectablesController extends BaseController<Collectable> 
         collectable.isVisible = true;
         collectable.setAllData(this.collectableWidth, cc.v2(position, 0), true, RandUtil.getRandomInteger(0, 1) === 0 ? false : true)
     }
+
+    collect(collectable: Collectable){
+        this.currentObjects = this.currentObjects.filter(obj => obj !== collectable);
+        this.pool.release(collectable);
+    }
 }

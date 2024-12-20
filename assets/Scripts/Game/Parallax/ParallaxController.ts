@@ -22,7 +22,7 @@ export default class ParallaxController extends BaseController<Parallax> {
             }
         }
         this.currentObjects.forEach(element => {
-            this.setupParallaxPart(element);
+            element.setAllData(1, cc.v2(), true);
         });
     }
 
@@ -37,11 +37,5 @@ export default class ParallaxController extends BaseController<Parallax> {
             modifier *= this.depthModifier;
         }
         return tweenArr;
-    }
-
-    private setupParallaxPart(parallax: Parallax): void {
-        parallax.position = cc.v2();
-        parallax.width = 1;
-        parallax.isVisible = true;
     }
 }

@@ -1,5 +1,7 @@
 import UserInput from "../../Input/UserInput"
+import CollectableView from "../../View/CollectableView/CollectableView";
 import CameraController from "../Camera/CameraController";
+import Collectable from "../Collectable/Collectable";
 import CollectablesController from "../Collectable/CollectablesController";
 import ParallaxController from "../Parallax/ParallaxController";
 import PlatformsController, { FitResult } from "../Platform/PlatformsController"
@@ -80,7 +82,7 @@ export default class GameManager {
         this.controllers.cameraController.reset();
         this.controllers.parallaxController.reset();
         this.startTweens.push(this._controllers.cameraController.move(currentPlatform.position.x - currentPlatform.width / 2));
-        this.startTweens.concat(this._controllers.parallaxController.move(currentPlatform.position.x - currentPlatform.width / 2));
+        this.startTweens = this.startTweens.concat(this._controllers.parallaxController.move(currentPlatform.position.x - currentPlatform.width / 2));
     }
 
     public start() {
@@ -91,6 +93,8 @@ export default class GameManager {
         });
         this.startTweens = [];
         this.scoreManager.score = 0;
+        this.scoreManager.collectableScore = 0;
+        this.scoreManager.collectableBuffer = 0;
         this.scoreManager.perfectLabel.content = "PERFECT";
     }
 
@@ -108,6 +112,8 @@ export default class GameManager {
         this.controllers.cameraController.reset();
         this.controllers.parallaxController.reset();
         this.scoreManager.score = 0;
+        this.scoreManager.collectableScore = 0;
+        this.scoreManager.collectableBuffer = 0;
     }
 
     private handleStickInput(stickLength: number) {
@@ -155,6 +161,8 @@ export default class GameManager {
                             this.controllers.playerController.currentState = PlayerState.Standing;
                             this.step();
                             this.scoreManager.score += fitResult === FitResult.Perfect ? 2 : 1;
+                            this.scoreManager.collectableScore += this.scoreManager.collectableBuffer;
+                            this.scoreManager.collectableBuffer = 0;
                         })
                         .start();
                 })
@@ -197,5 +205,23 @@ export default class GameManager {
         movePlatformsTween.forEach(tween => {
             tween.start();
         });
+    }
+
+    playerCollisionDetected(other: cc.Collider){
+        if (other.node.group === "platform"){
+            cc.Tween.stopAll();
+            this.controllers.playerController.currentState = PlayerState.Standing
+            this._controllers.playerController.looseTween
+                .call(() => {
+                    this.stateManager.currentGameState = GameState.Loss;
+                })
+                .start();
+            this._controllers.sticksController.fallingTween
+                .start();
+        }
+        else {
+            this.controllers.collectablesController.collect(other.node.getComponent(CollectableView).base);
+            this.scoreManager.collectableBuffer++;
+        }
     }
 }

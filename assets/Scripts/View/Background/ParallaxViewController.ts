@@ -9,17 +9,23 @@ export default class ParallaxViewController extends BaseViewController<Parallax,
 
     private currentParallaxId = 0;
 
+    currentScreenSize: cc.Size;
+
     public loadParallaxNodes(): number{
         this.viewFolder.getComponentsInChildren(ParallaxView).forEach(parallax => {
             this.viewList.push(parallax)
         });
 
         let maxHeight = 0;
+        let maxWidth = 0;
         this.viewList.forEach(parallax => {
             maxHeight = Math.max(parallax.node.height, maxHeight);
+            maxWidth = Math.max(parallax.node.width, maxWidth);
         });
 
-        let currentScale = this._currentFieldSize.height / maxHeight;
+        const baseScale = this._currentFieldSize.width / this.currentScreenSize.width;
+        
+        let currentScale = Math.max(this.currentScreenSize.height * baseScale / maxHeight, this._currentFieldSize.width / maxWidth);
 
         this.viewList.forEach(parallax => {
             parallax.node.scale = currentScale;

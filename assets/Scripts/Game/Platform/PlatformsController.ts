@@ -11,7 +11,7 @@ export enum FitResult {
 export default class PlatformsController extends BaseController<Platform> {
     private startPlatformWidth: number = 0.2;
     private platformSizeRange: [number, number] = [0.1, 0.5];
-    private nextDistanceRange: [number, number] = [0.1, 1];
+    private nextDistanceRange: [number, number] = [0.2, 1];
     private spawningPlatformTime: number = 0.2;
     private _currentDistance: number = 0;
     private perfectWidth: number = 0.02;

@@ -89,6 +89,7 @@ export default class GameViewManager extends cc.Component {
         this.platformsViewController.init(stack.platformsController);
         this.sticksViewController.init(stack.sticksController);
         this.playerViewController.init(stack.playerController);
+        this.playerViewController.contactCallback = (other: cc.Collider) => this.gameManager.playerCollisionDetected(other);
         this.parallaxViewController.init(stack.parallaxController);
         this.collectablesViewController.init(stack.collectablesController);
     }
@@ -96,6 +97,7 @@ export default class GameViewManager extends cc.Component {
     private initializeUI(): void {
         this.uiController.initScoreLabel(this.gameManager.scoreManager.scoreLabel);
         this.uiController.initPerfectLabel(this.gameManager.scoreManager.perfectLabel);
+        this.uiController.initCollectableLabel(this.gameManager.scoreManager.collectableLabel)
     }
 
     private getController<T>(controllerType: new (...args: any[]) => T): T {
@@ -111,7 +113,8 @@ export default class GameViewManager extends cc.Component {
 
         const windowSize = cc.view.getCanvasSize();
         const parallaxSize = cc.size(designSize.width, (windowSize.height / windowSize.width) * designSize.width);
-        this.parallaxViewController.updateFieldSize(parallaxSize);
+        this.parallaxViewController.currentScreenSize = windowSize;
+        this.parallaxViewController.updateFieldSize(designSize);
     }
 
     private onStateChanged(): void {

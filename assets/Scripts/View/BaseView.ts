@@ -9,10 +9,13 @@ export default abstract class BaseView<T> extends cc.Component {
         this._bottomIndentPercent = value;
     }
 
-    protected base: T = null;
+    private _base: T = null;
+    public get base(): T {
+        return this._base;
+    }
 
     init(base: T) {
-        this.base = base;
+        this._base = base;
         (this.base as any).dataChanged.on(() => this.onOriginDataChanged());
         this.onOriginDataChanged();
     }

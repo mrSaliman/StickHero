@@ -19,6 +19,12 @@ export default class UIController extends cc.Component {
     resultGameScore: LabelView = null;
 
     @property(LabelView)
+    collectableScore: LabelView = null;
+
+    @property(LabelView)
+    resultCollectableScore: LabelView = null;
+
+    @property(LabelView)
     perfectLabel: LabelView = null;
 
     @property(cc.Node)
@@ -48,6 +54,11 @@ export default class UIController extends cc.Component {
     public initScoreLabel(base: Label){
         this.gameScore.init(base);
         this.resultGameScore.init(base);
+    }
+
+    public initCollectableLabel(base: Label){
+        this.collectableScore.init(base);
+        this.resultCollectableScore.init(base);
     }
 
     public initPerfectLabel(base: Label){
