@@ -14,7 +14,7 @@ export default class PlatformsController extends BaseController<Platform> {
     private nextDistanceRange: [number, number] = [0.2, 1];
     private spawningPlatformTime: number = 0.2;
     private _currentDistance: number = 0;
-    private perfectWidth: number = 0.1;
+    private perfectWidth: number = 0.02;
 
     constructor() {
         super(() => new Platform());
