@@ -8,6 +8,7 @@ export default class SticksController extends BaseController<Stick> {
 
     public get fallingTween(): cc.Tween<Stick> {
         return cc.tween(this.growingStick)
+            .tag(0)
             .by(0.5, { rotation: -90 }, { easing: "bounceOut" });
     }
 

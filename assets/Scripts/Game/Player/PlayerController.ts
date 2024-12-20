@@ -36,6 +36,7 @@ export default class PlayerController extends BaseController<Player> {
         distance = Math.min(Math.max(distance, this.playerWidth), 1);
         if (distance > rightPlatformEdge) distance = Math.max(rightPlatformEdge + this.playerWidth, distance);
         return cc.tween(this.currentPlayer)
+            .tag(0)
             .by(distance / speed, { position: cc.v2(distance - (shift ? (this.playerWidth / 2) : 0), 0) });
     }
 
@@ -46,6 +47,7 @@ export default class PlayerController extends BaseController<Player> {
         player.isVisible = true;
 
         this._looseTween = cc.tween(player)
+            .tag(0)
             .by(1, { position: cc.v2(0, -1) });
     }
 }

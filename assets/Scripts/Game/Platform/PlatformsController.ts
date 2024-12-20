@@ -14,7 +14,7 @@ export default class PlatformsController extends BaseController<Platform> {
     private nextDistanceRange: [number, number] = [0.2, 1];
     private spawningPlatformTime: number = 0.2;
     private _currentDistance: number = 0;
-    private perfectWidth: number = 0.02;
+    private perfectWidth: number = 0.1;
 
     constructor() {
         super(() => new Platform());
@@ -39,6 +39,7 @@ export default class PlatformsController extends BaseController<Platform> {
         let platform = this.next;
         platform.showPlusOne = true;
         cc.tween(platform)
+            .tag(1)
             .delay(1)
             .call(() => {
                 platform.showPlusOne = false;

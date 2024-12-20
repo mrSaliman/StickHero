@@ -45,9 +45,17 @@ export default class ScoreManager {
 
     public showPerfect() {
         cc.tween(this._perfectLabel)
+            .tag(1)
             .to(0.2, { opacity: 255 })
             .delay(0.3)
             .to(0.5, { opacity: 0 })
             .start();
+    }
+
+    public reset(){
+        this.score = 0;
+        this.collectableScore = 0;
+        this.collectableBuffer = 0;
+        this.perfectLabel.content = "PERFECT";
     }
 }

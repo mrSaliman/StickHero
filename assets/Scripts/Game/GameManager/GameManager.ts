@@ -92,10 +92,7 @@ export default class GameManager {
             t.start();
         });
         this.startTweens = [];
-        this.scoreManager.score = 0;
-        this.scoreManager.collectableScore = 0;
-        this.scoreManager.collectableBuffer = 0;
-        this.scoreManager.perfectLabel.content = "PERFECT";
+        this.scoreManager.reset();
     }
 
     public restart() {
@@ -111,9 +108,7 @@ export default class GameManager {
         this.controllers.playerController.resetWithPosition(currentPlatform.position.x + currentPlatform.width / 2, true);
         this.controllers.cameraController.reset();
         this.controllers.parallaxController.reset();
-        this.scoreManager.score = 0;
-        this.scoreManager.collectableScore = 0;
-        this.scoreManager.collectableBuffer = 0;
+        this.scoreManager.reset();
     }
 
     private handleStickInput(stickLength: number) {
@@ -171,7 +166,7 @@ export default class GameManager {
     }
 
     handleFlipInput() {
-        if (this.controllers.playerController.currentState === PlayerState.Standing) return;
+        if (this.controllers.playerController.currentState !== PlayerState.Running) return;
         const currentPlayer = this.controllers.playerController.currentPlayer;
         const currentPlatform = this._controllers.platformsController.current;
         const nextPlatform = this._controllers.platformsController.next;
@@ -208,8 +203,9 @@ export default class GameManager {
     }
 
     playerCollisionDetected(other: cc.Collider){
+        if (this.controllers.playerController.currentState !== PlayerState.Running) return;
         if (other.node.group === "platform"){
-            cc.Tween.stopAll();
+            cc.Tween.stopAllByTag(0);
             this.controllers.playerController.currentState = PlayerState.Standing
             this._controllers.playerController.looseTween
                 .call(() => {
